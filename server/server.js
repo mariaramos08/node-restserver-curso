@@ -1,6 +1,9 @@
 require('./config/config')
 
 const express = require('express')
+const mongoose = require('mongoose');
+
+
 const app = express()
 
 const bodyParser = require('body-parser')
@@ -11,26 +14,19 @@ app.use(bodyParser.urlencoded({ extended: false }))
 // parse application/json
 app.use(bodyParser.json())
 
-app.get('/', function(req, res) {
-    res.send('Hola mundo')
-})
+app.use(require('./routes/usuario'));
 
-app.get('/usuarios', function(req, res) {
-    res.send('GET USUARIO')
-})
-app.post('/usuarios', function(req, res) {
-    let body = req.body;
-    let id = req.params.id;
-    res.json(body)
-})
-app.put('/usuarios/:id', function(req, res) {
-    let body = req.body;
-    let id = req.params.id;
-    res.json(body)
-})
-app.delete('/usuarios', function(req, res) {
-    res.send('DELETE USUARIO')
-})
+mongoose.set('useCreateIndex', true);
+
+
+mongoose.connect(process.env.URLDB, {
+        useUnifiedTopology: true,
+        useNewUrlParser: true
+    })
+    .then(() => console.log("DB Connected!"))
+    .catch(err => {
+        console.log(`DB connection Error: ${err}`)
+    });
 
 app.listen(process.env.PORT, () => {
     console.log(`Escuchando por el puerto ${process.env.PORT}`)
